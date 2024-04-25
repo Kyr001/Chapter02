@@ -22,6 +22,7 @@ namespace Chapter02
             {
                 string Lv = string.Format("{0:D2}", Level);
 
+                Console.Clear();
                 Console.WriteLine("상태 보기");
                 Console.WriteLine("캐릭터의 정보가 표시됩니다.");
                 Console.WriteLine();
@@ -53,12 +54,30 @@ namespace Chapter02
 
             public void StatUnD(Item I)
             {
+                //trigger로 이전 반복에서 장착돼 있는지 아닌지 판단함
+                if (I.Trigger == 0 && I.isEquiped)
+                {
+                    if (I.Effect == "공격력")
+                        AtkUnD += I.Stat;
+                    if (I.Effect == "방어력")
+                        DefUnD += I.Stat;
+                    I.Trigger = 1;
+                }
+                else if (I.Trigger == 1 && !I.isEquiped)
+                {
+                    if (I.Effect == "공격력")
+                        AtkUnD -= I.Stat;
+                    if (I.Effect == "방어력")
+                        DefUnD -= I.Stat;
+                    I.Trigger = 0;
+                }
+                else
+                    return;
             }
         }
 
         public class Item
         {
-            public int ItemNum;
             public string? Name;
             public string? Effect;
             public int Stat;
@@ -68,39 +87,42 @@ namespace Chapter02
             public bool isBought;
             public int Trigger;
 
-
-            public void IvenList(char type)
+            public void IvenList()
             {
-                if (type == '0' && isBought == true)
-                    Console.Write("- ");
-                else if (type == '1' && isBought == true)
-                    Console.Write("- {0} ", ItemNum);
-                else
-                    return;
-
                 if (isEquiped == true)
                     Console.Write("[E]");
-                Console.Write("{0}      | {1} +{2} | {3}", Name, Effect, Stat, Detail);
+                Console.Write("{0} | {1} +{2} | {3}", Name, Effect, Stat, Detail);
                 Console.WriteLine();
             }
 
-            public void StoreList(char type)
+            public void StoreList()
             {
-                if (type == '0')
-                    Console.Write("- ");
-                else if (type == '1')
-                    Console.Write("- {0} ", ItemNum);
-                else
-                    return;
-
                 if (isEquiped == true)
                     Console.Write("[E]");
-                Console.Write("{0}      | {1} +{2} | {3}", Name, Effect, Stat, Detail);
+                Console.Write("{0} | {1} +{2} | {3}", Name, Effect, Stat, Detail);
                 if (isBought == true)
-                    Console.Write("             |  구매완료");
+                    Console.Write("|  구매완료");
                 else
-                    Console.Write("             |  {0} G", Price);
+                    Console.Write("|  {0} G", Price);
                 Console.WriteLine();
+            }
+
+            public void Buy(Player p)
+            {
+                if (!isBought)
+                    if (p.Gold < Price)
+                        Console.WriteLine("Gold가 부족합니다.");
+                    else
+                    {
+                        isBought = true;
+                        p.Gold -= Price; ;
+                        Console.WriteLine("구매를 완료했습니다.");
+                    }
+                else
+                    Console.WriteLine("이미 구매한 아이템입니다.");
+
+                Console.WriteLine("시작 화면으로 돌아갑니다.");
+                Thread.Sleep(2000);
             }
         }
 
@@ -117,27 +139,74 @@ namespace Chapter02
             p.HP = 100;
             p.Gold = 1500;
 
+            Item[] I = new Item[6];
+
+            Item I0 = new Item();
+            I0.Name = "수련자 갑옷   ";
+            I0.Effect = "방어력";
+            I0.Stat = 5;
+            I0.Detail = "수련에 도움을 주는 갑옷입니다.             ";
+            I0.Price = 1000;
+            I0.isEquiped = false;
+            I0.isBought = false;
+            I0.Trigger = 0;
+
+            I[0] = I0;
             Item I1 = new Item();
-            I1.ItemNum = 1;
-            I1.Name = "무쇠갑옷";
+            I1.Name = "무쇠갑옷     ";
             I1.Effect = "방어력";
-            I1.Stat = 5;
-            I1.Detail = "무쇠로 만들어져 튼튼한 갑옷입니다.";
+            I1.Stat = 9;
+            I1.Detail = "무쇠로 만들어져 튼튼한 갑옷입니다.           ";
             I1.Price = 0;
             I1.isEquiped = false;
             I1.isBought = false;
             I1.Trigger = 0;
+            I[1] = I1;
 
             Item I2 = new Item();
-            I2.ItemNum = 2;
-            I2.Name = "낡은 검";
-            I2.Effect = "공격력";
-            I2.Stat = 2;
-            I2.Detail = "쉽게 볼 수 있는 낡은 검 입니다.";
-            I2.Price = 600;
+            I2.Name = "스파르타의 갑옷";
+            I2.Effect = "방어력";
+            I2.Stat = 15;
+            I2.Detail = "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.";
+            I2.Price = 3500;
             I2.isEquiped = false;
             I2.isBought = false;
             I2.Trigger = 0;
+            I[2] = I2;
+
+            Item I3 = new Item();
+            I3.Name = "낡은 검     ";
+            I3.Effect = "공격력";
+            I3.Stat = 2;
+            I3.Detail = "쉽게 볼 수 있는 낡은 검 입니다.            ";
+            I3.Price = 600;
+            I3.isEquiped = false;
+            I3.isBought = false;
+            I3.Trigger = 0;
+            I[3] = I3;
+
+            Item I4 = new Item();
+            I4.Name = "청동 도끼    ";
+            I4.Effect = "공격력";
+            I4.Stat = 5;
+            I4.Detail = "어디선가 사용됐던거 같은 도끼입니다.        ";
+            I4.Price = 1500;
+            I4.isEquiped = false;
+            I4.isBought = false;
+            I4.Trigger = 0;
+            I[4] = I4;
+
+            Item I5 = new Item();
+            I5.Name = "스파르타의 창 ";
+            I5.Effect = "공격력";
+            I5.Stat = 7;
+            I5.Detail = "스파르타의 전사들이 사용했다는 전설의 창입니다. ";
+            I5.Price = 0;
+            I5.isEquiped = false;
+            I5.isBought = false;
+            I5.Trigger = 0;
+            I[5] = I5;
+
 
             string input;
 
@@ -158,15 +227,19 @@ namespace Chapter02
                 switch (input)
                 {
                     case "1":
-                        StatUnD(p, I1);
-                        StatUnD(p, I2);
+                        p.StatUnD(I[0]);
+                        p.StatUnD(I[1]);
+                        p.StatUnD(I[2]);
+                        p.StatUnD(I[3]);
+                        p.StatUnD(I[4]);
+                        p.StatUnD(I[5]);
                         p.ViewInfo();
                         break;
                     case "2":
-                        ViewInven(I1, I2);
+                        ViewInven(I);
                         break;
                     case "3":
-                        ViewStore(p, I1, I2);
+                        ViewStore(p, I);
                         break;
                     case "0":
                         Console.WriteLine("게임을 종료합니다.");
@@ -179,10 +252,8 @@ namespace Chapter02
             } while (input != "0");
         }
 
-        static public void ViewInven(Item I1, Item I2)
+        static public void ViewInven(Item[] I)
         {
-            char type = '0';
-
             Console.Clear();
             Console.WriteLine("인벤토리");
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
@@ -190,8 +261,14 @@ namespace Chapter02
 
             //보유 중인 아이템을 표시
             Console.WriteLine("[아이템 목록]");
-            I1.IvenList(type);
-            I2.IvenList(type);
+            for (int i = 0; i < I.Length; i++)
+            {
+                if (I[i].isBought)
+                {
+                    Console.Write("- ");
+                    I[i].IvenList();
+                }
+            }
 
             Console.WriteLine();
             Console.WriteLine("1. 장착 관리");
@@ -202,14 +279,13 @@ namespace Chapter02
             string? input = Console.ReadLine();
 
             if (input == "1")
-                InvenManager(I1, I2);
+                InvenManager(I);
             else if (input == "0")
                 return;
         }
 
-        static public void InvenManager(Item I1, Item I2)
+        static public void InvenManager(Item[] I)
         {
-            char type = '1';
             string input;
 
             Console.Clear();
@@ -219,9 +295,15 @@ namespace Chapter02
 
             //아이템 앞에 번호 표시
             Console.WriteLine("[아이템 목록]");
-            I1.IvenList(type);
-            I2.IvenList(type);
 
+            for (int i = 0; i < I.Length; i++)
+            {
+                if (I[i].isBought)
+                {
+                    Console.Write("- {0} ", i + 1);
+                    I[i].IvenList();
+                }
+            }
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -231,27 +313,42 @@ namespace Chapter02
             do
             {
                 input = Console.ReadLine();
+                switch(input)
+                {
+                    case "1":
+                        I[0].isEquiped = (!I[0].isEquiped) ? true : false;
+                        return;
+                    case "2":
+                        I[1].isEquiped = (!I[1].isEquiped) ? true : false;
+                        return;
 
-                if (input == "1")
-                {
-                    I1.isEquiped = (!I1.isEquiped) ? true : false;
-                    return;
+                    case "3":
+                        I[2].isEquiped = (!I[2].isEquiped) ? true : false;
+                        return;
+                    case "4":
+                        I[3].isEquiped = (!I[3].isEquiped) ? true : false;
+                        return;
+
+                    case "5":
+                        I[4].isEquiped = (!I[4].isEquiped) ? true : false;
+                        return;
+                    case "6":
+                        I[5].isEquiped = (!I[5].isEquiped) ? true : false;
+                        return;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("잘못된 입력입니다. 다시 입력하세요.");
+                        break;
                 }
-                else if (input == "2")
-                {
-                    I2.isEquiped = (!I2.isEquiped) ? true : false;
-                    return;
-                }
-                else if (input == "0")
-                    return;
-                else
-                    Console.WriteLine("잘못된 입력입니다");
+
             } while (input != "0");
         }
 
-        static public void ViewStore(Player p, Item I1, Item I2)
+        static public void ViewStore(Player p, Item[] I)
         {
-            char type = '0';
 
             Console.Clear();
             Console.WriteLine("상점");
@@ -263,8 +360,11 @@ namespace Chapter02
             Console.WriteLine();
 
             Console.WriteLine("[아이템 목록]");
-            I1.StoreList(type);
-            I2.StoreList(type);
+            for (int i = 0; i < I.Length; i++)
+            {
+                Console.Write("- ");
+                I[i].StoreList();
+            }
 
             Console.WriteLine();
             Console.WriteLine("1. 아이템 구매");
@@ -275,14 +375,13 @@ namespace Chapter02
             string? input = Console.ReadLine();
 
             if (input == "1")
-                BuyItems(p, I1, I2);
+                BuyItems(p, I);
             else if (input == "0")
                 return;
         }
 
-        static public void BuyItems(Player p, Item I1, Item I2)
+        static public void BuyItems(Player p, Item[] I)
         {
-            char type = '1';
             string input;
 
             Console.Clear();
@@ -295,8 +394,11 @@ namespace Chapter02
             Console.WriteLine();
 
             Console.WriteLine("[아이템 목록]");
-            I1.StoreList(type);
-            I2.StoreList(type);
+            for (int i = 0; i < I.Length; i++)
+            {
+                Console.Write("- {0} ", i + 1);
+                I[i].StoreList();
+            }
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -307,60 +409,37 @@ namespace Chapter02
             {
                 input = Console.ReadLine();
 
-                if (input == "1")
-                    if (!I1.isBought)
-                        if (p.Gold < I1.Price)
-                            Console.WriteLine("Gold가 부족합니다.");
-                        else
-                        {
-                            I1.isBought = true;
-                            p.Gold -= I1.Price;;
-                            return;
-                        }
-                    else
-                        Console.WriteLine("이미 구매한 아이템입니다.");
+                switch (input)
+                {
+                    case "1":
+                        I[0].Buy(p);
+                        return;
+                    case "2":
+                        I[1].Buy(p);
+                        return;
 
-                else if (input == "2")
-                    if (!I2.isBought)
-                        if (p.Gold < I2.Price)
-                            Console.WriteLine("Gold가 부족합니다.");
-                        else
-                        {
-                            I2.isBought = true;
-                            p.Gold -= I2.Price; ;
-                            return;
-                        }
-                    else
-                        Console.WriteLine("이미 구매한 아이템입니다.");
+                    case "3":
+                        I[2].Buy(p);
+                        return;
+                    case "4":
+                        I[3].Buy(p);
+                        return;
 
-                else
-               {
-                   Console.WriteLine("잘못된 입력입니다.");
-               }
+                    case "5":
+                        I[4].Buy(p);
+                        return;
+                    case "6":
+                        I[5].Buy(p);
+                        return;
+
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("잘못된 입력입니다. 다시 입력하세요.");
+                        break;
+                }
             } while (input != "0");
-        }
 
-        static public void StatUnD(Player p, Item I)
-        {
-            //trigger로 이전 반복에서 장착돼 있는지 아닌지 판단함
-            if (I.Trigger == 0 && I.isEquiped)
-            {
-                if (I.Effect == "공격력")
-                    p.AtkUnD += I.Stat;
-                if (I.Effect == "방어력")
-                    p.DefUnD += I.Stat;
-                I.Trigger = 1;
-            }
-            else if (I.Trigger == 1 && !I.isEquiped)
-            {
-                if (I.Effect == "공격력")
-                    p.AtkUnD -= I.Stat;
-                if (I.Effect == "방어력")
-                    p.DefUnD -= I.Stat;
-                I.Trigger = 0;
-            }
-            else
-                return;
         }
     }
 }
