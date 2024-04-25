@@ -28,7 +28,6 @@ namespace Chapter02
                 Console.WriteLine("Lv. {0}", Lv);
                 Console.WriteLine("{0} ( {1} )", Name, Job);
 
-                //증감수치가 0일 때 코드 짜야함
                 if (AtkUnD == 0)
                     Console.WriteLine("공격력 : {0} ", Atk);
                 else
@@ -64,17 +63,28 @@ namespace Chapter02
             public bool isEquiped;
             public bool isBought;
 
-            public void IvenList()
+
+            public void ViewIven2()
             {
 
+            }
+
+
+            public void IvenList(int type)
+            {
                 //인벤: 보유O, 장착 상관없이 아이템 표시 / E표시 있음
-                //Console.Write("- ");
+                if (type == '0' && isBought == true)
+                    Console.Write("- ");
+                //장착 관리: 보유O, 장착 상관없이 아이템 표시 / E표시 있음 / 번호있음
+                else if (type == '1' && isBought == true)
+                    Console.Write("- {0} ", ItemNum);
+                else
+                    return;
+
                 if (isEquiped == true)
                     Console.Write("[E]");
                 Console.Write("{0}      | {1} +{2} | {3}", Name, Effect, Stat, Detail);
                 Console.WriteLine();
-
-                //장착 관리: 보유O, 장착 상관없이 아이템 표시 / E표시 있음 / 번호있음
             }
 
             public void StoreList()
@@ -119,10 +129,19 @@ namespace Chapter02
             I1.isEquiped = false;
             I1.isBought = false;
 
+            Item I2 = new Item();
+            I2.ItemNum = 2;
+            I2.Name = "낡은 검";
+            I2.Effect = "공격력";
+            I2.Stat = 2;
+            I2.Detail = "쉽게 볼 수 있는 낡은 검 입니다.";
+            I2.Price = 600;
+            I2.isEquiped = false;
+            I2.isBought = false;
+
             //Console.Clear();
 
             int statUpDown = 0; // 스탯 증감치
-            int iCount = 0; // 6가지 중에 보유중인 아이템 개수
             string input;
 
             do
@@ -170,11 +189,7 @@ namespace Chapter02
 
             //보유 중인 아이템을 표시
             Console.WriteLine("[아이템 목록]");
-            if (I1.isBought)
-            {
-                Console.Write("- ");
-                I1.IvenList();
-            }
+            I1.IvenList(type);
 
             Console.WriteLine();
             Console.WriteLine("1. 장착 관리");
@@ -192,6 +207,7 @@ namespace Chapter02
 
         static public void InvenManager(Item I1)
         {
+            char type = '1';
             string input;
             Console.Clear();
             Console.WriteLine("인벤토리 - 장착 관리");
@@ -200,12 +216,7 @@ namespace Chapter02
 
             //아이템 앞에 번호 표시
             Console.WriteLine("[아이템 목록]");
-            if (I1.isBought)
-            {
-                Console.Write("- {0} ", I1.ItemNum);
-                I1.IvenList();
-            }
-
+            I1.IvenList(type);
 
             Console.WriteLine();
             Console.WriteLine("0. 나가기");
@@ -287,6 +298,7 @@ namespace Chapter02
                         else
                         {
                             I1.isBought = true;
+                            p.Gold -= I1.Price;;
                             return;
                         }
                     else
